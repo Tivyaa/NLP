@@ -1,0 +1,42 @@
+import nltk
+nltk.download('punkt')  # Download the necessary data for tokenization
+
+from nltk.util import ngrams
+from collections import Counter
+
+# Sample text
+text = "programming with Python"
+
+# Tokenizing the text into words
+tokens = nltk.word_tokenize(text)
+
+# Function to generate N-grams
+def generate_ngrams(tokens, n):
+    return list(ngrams(tokens, n))
+
+# Generate Unigrams (1-grams), Bigrams (2-grams), and Trigrams (3-grams)
+unigrams = generate_ngrams(tokens, 1)
+bigrams = generate_ngrams(tokens, 2)
+trigrams = generate_ngrams(tokens, 3)
+
+# Output the N-grams
+print(f"Unigrams: {unigrams}")
+print(f"Bigrams: {bigrams}")
+print(f"Trigrams: {trigrams}")
+
+# Count frequencies of N-grams
+unigram_freq = Counter(unigrams)
+bigram_freq = Counter(bigrams)
+trigram_freq = Counter(trigrams)
+
+print("\nFrequency of Unigrams:")
+for unigram, freq in unigram_freq.items():
+    print(f"{unigram}: {freq}")
+
+print("\nFrequency of Bigrams:")
+for bigram, freq in bigram_freq.items():
+    print(f"{bigram}: {freq}")
+
+print("\nFrequency of Trigrams:")
+for trigram, freq in trigram_freq.items():
+    print(f"{trigram}: {freq}")
