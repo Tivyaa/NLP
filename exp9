@@ -1,0 +1,39 @@
+!pip install svgling
+
+import nltk
+from nltk import word_tokenize, pos_tag
+from nltk.chunk import RegexpParser
+from nltk.tree import Tree
+from svgling import draw_tree
+
+# Download necessary NLTK data
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+# Download the missing 'averaged_perceptron_tagger_eng' package
+nltk.download('averaged_perceptron_tagger_eng')
+
+
+# Sample sentence
+sentence = "The quick brown fox jumped over the lazy dog"
+
+# Tokenization and POS tagging
+tokens = word_tokenize(sentence)
+tagged = pos_tag(tokens)
+
+# Defining chunking rules
+grammar = r"""
+NP: {<DT>?<JJ>*<NN>}  # Noun Phrase
+VP: {<VB.*><NP|PP>*}  # Verb Phrase
+PP: {<IN><NP>}        # Prepositional Phrase
+"""
+
+# Parsing chunks
+chunk_parser = RegexpParser(grammar)
+chunked = chunk_parser.parse(tagged)
+
+# Output results
+print("Chunked Output:")
+print(chunked)
+
+# Use svgling to display the tree:
+draw_tree(chunked) # Instead of chunked.draw()
