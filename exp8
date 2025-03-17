@@ -1,0 +1,59 @@
+import nltk
+from nltk.corpus import treebank
+from nltk import pos_tag
+from nltk import word_tokenize
+from nltk.classify import NaiveBayesClassifier
+from nltk.probability import FreqDist
+
+# Download required NLTK data
+nltk.download('treebank')
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')  # Download tagger data
+
+# Step 1: Load the Treebank corpus for training
+train_sents = treebank.tagged_sents()
+
+# Step 2: Feature extraction function
+def word_features(word, prev_tag=None):
+    features = {
+        'word': word,
+        'word_lower': word.lower(),
+        'prefix-1': word[0],
+        'suffix-1': word[-1],
+        'prefix-2': word[:2] if len(word) > 1 else '',  # Handle short words
+        'suffix-2': word[-2:] if len(word) > 1 else '',  # Handle short words
+        'is_capitalized': word[0].isupper(),
+        'is_digit': word.isdigit()
+    }
+    if prev_tag:
+        features['prev_tag'] = prev_tag  # Add previous tag as a feature
+    return features
+
+# Step 3: Prepare the training data
+train_data = []
+for sentence in train_sents:
+    prev_tag = None  # Initialize previous tag for the first word
+    for word, tag in sentence:
+        features = word_features(word, prev_tag)
+        train_data.append((features, tag))
+        prev_tag = tag  # Update previous tag for the next word
+
+# Step 4: Train the Naive Bayes Classifier
+classifier = NaiveBayesClassifier.train(train_data)
+
+# Step 5: Test the POS Tagger on a new sentence
+test_sentence = "The quick brown fox jumps over the lazy dog".split()
+
+# Extract features for the test sentence, considering previous tags
+test_features = []
+prev_tag = None
+for word in test_sentence:
+    features = word_features(word, prev_tag)
+    test_features.append(features)
+    # Predict tag for the current word and update prev_tag for the next word
+    predicted_tag = classifier.classify(features)
+    prev_tag = predicted_tag
+
+# Output the POS tags for the sentence
+print(f"Sentence: {test_sentence}")
+print(f"POS Tags: {list(zip(test_sentence, [classifier.classify(f) for f in test_features]))}")
