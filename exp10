@@ -1,0 +1,43 @@
+import nltk
+from nltk.corpus import conll2000
+from nltk.tag import UnigramTagger
+from nltk.chunk import ChunkParserI, tree2conlltags, conlltags2tree
+
+nltk.download('conll2000')
+
+class CustomChunker(ChunkParserI):
+    def __init__(self, train_sents):
+        # Corrected to use (word, pos, chunk) tuples for training
+        train_data = [[(pos, chunk) for word, pos, chunk in tree2conlltags(sent)] for sent in train_sents]
+        self.tagger = UnigramTagger(train_data)
+
+    def parse(self, tagged_sentence):
+        # Extract POS tags from the tagged sentence
+        tags = [pos for word, pos in tagged_sentence]
+
+        # Predict chunk tags using the trained tagger
+        chunk_tags = self.tagger.tag(tags)
+
+        # Combine words, POS tags, and predicted chunk tags
+        conlltags = [(word, pos, chunk) for ((word, pos), (pos, chunk)) in zip(tagged_sentence, chunk_tags)]
+
+        # Convert conlltags to a chunked tree
+        return conlltags2tree(conlltags)
+
+# Load training and testing data
+train_sents = conll2000.chunked_sents('train.txt', chunk_types=['NP'])
+test_sents = conll2000.chunked_sents('test.txt', chunk_types=['NP'])
+
+# Train the custom chunker
+chunker = CustomChunker(train_sents)
+
+# Test on a sample sentence
+sentence = [("The", "DT"), ("quick", "JJ"), ("brown", "JJ"), ("fox", "NN"), ("jumps", "VBZ"),
+            ("over", "IN"), ("the", "DT"), ("lazy", "JJ"), ("dog", "NN")]
+
+# Chunk the sentence
+chunked_tree = chunker.parse(sentence)
+
+# Print the chunked result
+print(chunked_tree)
+# chunked_tree.draw()  # You might need to install tkinter for this to work: 'sudo apt-get install python3-tk'
