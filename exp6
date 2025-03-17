@@ -1,0 +1,23 @@
+import nltk
+from nltk.corpus import treebank
+from nltk.tag import hmm
+from nltk.probability import ConditionalFreqDist
+
+# Download required resources
+nltk.download('treebank')
+nltk.download('universal_tagset')
+
+# Step 1: Load the treebank corpus for training
+train_sents = treebank.tagged_sents()
+
+# Step 2: Train the HMM POS Tagger
+trainer = hmm.HiddenMarkovModelTrainer()
+pos_tagger = trainer.train(train_sents)
+
+# Step 3: Tag a sample sentence
+sentence = "The quick brown fox jumps over the lazy dog".split()
+tags = pos_tagger.tag(sentence)
+
+# Output the POS tags
+print("Sentence:", sentence)
+print("POS Tags:", tags)
