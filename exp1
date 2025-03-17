@@ -1,0 +1,28 @@
+import string
+from collections import Counter
+
+def word_analysis(text):
+    text = text.lower()  # Convert text to lowercase
+    text = text.translate(str.maketrans("", "", string.punctuation))  # Remove punctuation
+    words = text.split()  # Tokenize text into words
+    stop_words = {"the", "is", "in", "and", "to", "of", "a", "for"}  # Define stop words
+    filtered_words = [word for word in words if word not in stop_words]  # Remove stop words
+    total_words = len(filtered_words)  # Count total words (excluding stop words)
+    unique_words = set(filtered_words)  # Get unique words
+    word_count = Counter(filtered_words)  # Count word frequency
+
+    print("Total Words (excluding stop words):", total_words)
+    print("Number of Unique Words:", len(unique_words))
+    print("\nTop 5 Most Frequent Words:")
+    for word, freq in word_count.most_common(5):
+        print(f"{word}: {freq}")
+
+# Input text
+text_input = """
+Word analysis is a fundamental task in natural language processing.
+It involves counting words, removing stop words, and analyzing word frequency.
+This experiment demonstrates how word analysis works.
+"""
+
+# Run the word analysis
+word_analysis(text_input)
